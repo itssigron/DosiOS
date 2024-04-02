@@ -1,0 +1,1 @@
+qemu-system-x86_64 -drive file=DiskImages/hareldolev-os.img,format=raw
