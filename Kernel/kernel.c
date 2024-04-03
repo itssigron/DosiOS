@@ -20,17 +20,19 @@ int kmain(void)
   init_fs();
 
   size_t path_size = 10;
-  char* initial_path = "dosi/";
+  char* initial_path = "dosi";
   char* path = (char*)malloc(path_size);
   
   char* command_info = NULL;
   strncat(path, initial_path, strl(initial_path));
 
+  create_directory(path, NULL, 0);
+
   printf("welcome to our terminal!!!\nto see the list of commands, enter \"help\"\n");
 
   while(true)
   {
-    printf("%s >", path);
+    printf("%s/ >", path);
     //check for create-file command
     char* get_command = getline();
 
@@ -49,19 +51,20 @@ int kmain(void)
       if(command_info)
       {
         //create path to file
-        char* all = (char*)malloc(strl(path) + strl(command_info) + 1);
+        char* all = (char*)malloc(strl(path) + strl(command_info) + 2);
         strncat(all, path, strl(path));
+        strncat(all, "/", 1);
         strncat(all, command_info, strl(command_info));
         all[strl(all)] = NULL;          
         if(navigate_file(all, NULL)) //check if file exist
         {
-          printf("data ('.' to stop) -> ");
+          printf("data -> ");
           char* data = getline();
           write_file(all, data, strl(data));
         }      
         else
         {
-          printf("ERROR! this file is not exist\n");
+          printf("ERROR! this file does not exists\n");
         }
       }
     }
@@ -80,8 +83,9 @@ int kmain(void)
       if(command_info)
       {
         //create path to file
-        char* all = (char*)malloc(strl(path) + strl(command_info) + 1);
+        char* all = (char*)malloc(strl(path) + strl(command_info) + 2);
         strncat(all, path, strl(path));
+        strncat(all, "/", 1);
         strncat(all, command_info, strl(command_info));
         all[strl(all)] = NULL;       
         inode_t* file_node = navigate_file(all, NULL);   
@@ -101,17 +105,17 @@ int kmain(void)
       size_t pathLen = strl(path);
       int i = 0;
       
-      //if it is not only the dosi folder 
-      if(pathLen != 5)
+      //if it is not the dosi (root) folder 
+      if(strcmp(path, "dosi") != 0)
       {
       //loop to find folder
         path[pathLen - 1] = NULL;
         for(i = pathLen; path[i] != '/' && i != 0; i--) {};
-        
+
         //check if have folder is not the root
         if(i != 0)
         {
-          path[i + 1] = NULL;
+          path[i] = NULL;
         }
       }
     }
@@ -121,8 +125,9 @@ int kmain(void)
       command_info = getInfoAfterCommand(get_command, "cd ");
       if(command_info)
       {
-        char* all = (char*)malloc(strl(path) + strl(command_info) + 1);
+        char* all = (char*)malloc(strl(path) + strl(command_info) + 2);
         strncat(all, path, strl(path));
+        strncat(all, "/", 1);
         strncat(all, command_info, strl(command_info));
         all[strl(all)] = NULL;
         inode_t* dir = navigate_dir(all, NULL);
@@ -131,8 +136,8 @@ int kmain(void)
         {
           path_size = strl(path) + strl(command_info) + 1;
           path = realloc(path, path_size);
-          strncat(path, command_info, strl(command_info));
           strncat(path, "/", 1);
+          strncat(path, command_info, strl(command_info));
         }
         else
         {
@@ -140,12 +145,32 @@ int kmain(void)
         }
       }
     }
+    else if(checkCommand(get_command, "ls"))
+    {
+      command_info = getInfoAfterCommand(get_command, "ls ");
+
+      if(command_info)
+      {
+        char* all = (char*)malloc(strl(path) + strl(command_info) + 2);
+        strncat(all, path, strl(path));
+        strncat(all, "/", 1);
+        strncat(all, command_info, strl(command_info));
+        all[strl(all)] = NULL;
+
+        ls(all);
+      }
+      else
+      {
+        ls(path);
+      }
+    }
     else if(checkCommand(get_command, "help"))
     {
         printf("commannds ->\n1: cdir [dir] - creates a directory\n2: cf [file_name] - creates a file\n3: cls - clean the terminal screen\n"
         "4: cd [dir] - get into dir\n"
         "5: write [file] - write contents to a file\n"
-        "6: cat [file] - read file contents\n");
+        "6: cat [file] - read file contents\n"
+        "7: ls [dir?] - list directory\n");
     }
     //clear treminal
     else if(checkCommand(get_command, "cls"))

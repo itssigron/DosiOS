@@ -72,6 +72,11 @@ char* getInfoAfterCommand(const char* str1, const char* command)
     size_t size_of_command = strl(command);
     size_t size_of_str1 = strl(str1);
 
+    if(size_of_command >= size_of_str1)
+    {
+      return NULL;
+    }
+
     // Find the position of the command in str1
     const char* commandPosition = str1;
 

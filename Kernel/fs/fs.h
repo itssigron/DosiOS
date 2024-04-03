@@ -134,6 +134,7 @@ inode_t* navigate_file(char* path, void** buff_ref);
 inode_t* find_file(char* buffer, size_t size, char* filename);
 inode_t* init_file(char* filename, uint8_t attributes);
 
+void ls(char* path);
 void init_fs();
 void load_shell();
 void root_setup_dir();

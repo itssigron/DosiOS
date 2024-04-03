@@ -384,6 +384,32 @@ void enter_file(inode_t* file, inode_t* dir) {
   cat_file(dir, file, DIR_ENTRY_SIZE);
 }
 
+void ls(char* path) {
+  inode_t* dir = navigate_dir(path, NULL);
+  if (!dir) {
+      printf("ERROR! this directory does not exists\n");
+      return;
+  }
+  
+  printf("List of files in %s:\n", path);
+  void* dir_buffer = kread_file(dir);
+  uint32_t num_entries = dir->size / DIR_ENTRY_SIZE;
+
+  for (uint32_t i = 0; i < num_entries; ++i) {
+      inode_t* entry = ((inode_t*)dir_buffer) + i;
+
+      if((entry->attributes & ATTRIBUTE_DIRECTORY) == ATTRIBUTE_DIRECTORY)
+      {
+        printf("%s/\n", entry->filename);
+      }
+      else
+      {
+        printf("%s.%s\n", entry->filename, entry->ext);
+      }
+  }
+}
+
+
 /* Find first cluster that is marked as free in the fat table */
 uint16_t fat_find_free_cluster(void* buffer, int* err) {
   
